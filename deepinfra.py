@@ -9,7 +9,6 @@ import time
 from typing import (Any, AsyncIterator, Callable, Dict, Iterator, List,
                     Mapping, Optional, Tuple, Type, Union)
 
-from environs import Env
 
 import aiohttp
 import requests
@@ -129,14 +128,13 @@ def _convert_message_to_dict(message: BaseMessage) -> dict:
 class ChatDeepInfra(BaseChatModel):
     """A chat model that uses the DeepInfra API."""
 
-    env = Env()
-    env.read_env(".env")
+
 
     # client: Any  #: :meta private:
     model_name: str = Field(default="mistralai/Mixtral-8x7B-Instruct-v0.1", alias="model")
     """Model name to use."""
     deepinfra_api_token: Optional[
-        str] = env("DEEPINFRA_API_TOKEN")
+        str] = "jwt:eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJnaDoxMDIxNzMxMDgiLCJleHAiOjE3MTUyNDA3NzF9.Vo7oeIp5_xjhWHanjRA8MuX5r-y2Y7H-yBkLlIke15Q"
     request_timeout: Optional[float] = Field(default=600, alias="timeout")
     request_sleep: Optional[float] = Field(default=2, alias="sleep")
     temperature: Optional[float] = 0.7

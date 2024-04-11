@@ -1,18 +1,14 @@
 import asyncio
 import logging
 
-from aiogram.enums import ParseMode
-from aiohttp import Bot, Dispatcher, F
+from aiogram import Bot, Dispatcher, F
 from aiogram.filters import Command
 from aiogram.fsm.storage.memory import MemoryStorage
 
 from course_master import ConsultGPT, llm
 
-from environs import Env
 
-env = Env()
-env.read_env(".env")
-bot_token = env("BOT_TOKEN")
+bot_token = "6863497960:AAF5cO6t8uErM54jpuxV7zF1UNQtlqPMeIA"
 
 consult_agent = None
 
@@ -23,7 +19,7 @@ async def main():
     bot = Bot(token=bot_token, parse_mode=None)
     logging.basicConfig(level=logging.INFO)
 
-    @dp.message(Command(commands=["start"]))
+    @dp.channel_post(Command(commands=["start"]))
     async def command_start(message):
         global consult_agent
         consult_agent = ConsultGPT.from_llm(llm, verbose=False)
@@ -31,7 +27,7 @@ async def main():
         ai_message = consult_agent.ai_step()
         await message.answer(ai_message)
 
-    @dp.message(F.text)
+    @dp.channel_post(F.text)
     async def process_text(message):
         if consult_agent is None:
             await message.answer("Используйте команду /start")
@@ -43,11 +39,12 @@ async def main():
             ai_message = consult_agent.ai_step()
             await message.answer(ai_message)
 
-    @dp.message(~F.text)
+    @dp.channel_post(~F.text)
     async def process_other(message):
         await message.answer("Бот принимает только текстовые сообщения")
 
-    await dp.start_polling(bot)
+    await bot.delete_webhook(drop_pending_updates=True)
+    await dp.start_polling(bot, allowed_updates=["channel_post"])
 
 
 if __name__ == "__main__":
