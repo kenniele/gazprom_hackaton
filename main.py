@@ -25,7 +25,7 @@ async def main():
         consult_agent = ConsultGPT.from_llm(llm, verbose=False)
         consult_agent.seed_agent()
         ai_message = consult_agent.ai_step()
-        # await message.answer(ai_message)
+        await message.answer(ai_message)
 
     @dp.message(F.text)
     async def process_text(message):
